@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikRewards - Interactive Demo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #121214;
+            --bg-tertiary: #1a1a1d;
+            --border-color: #25252a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a8;
+            --primary: #e74c60;
+            --primary-dark: #d12d4b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background animation */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(231, 76, 96, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(231, 76, 96, 0.03) 0%, transparent 50%);
+            animation: bgRotate 30s linear infinite;
+        }
+
+        @keyframes bgRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header */
+        header {
+            background: rgba(18, 18, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #ff6b7a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .points-display {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .points-badge {
+            background: rgba(231, 76, 96, 0.1);
+            border: 2px solid rgba(231, 76, 96, 0.3);
+            padding: 0.5rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .points-number {
+            color: var(--primary);
+            font-size: 1.25rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Main Content */
+        main {
+            padding: 2rem 0;
+            min-height: calc(100vh - 80px);
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Login Screen */
+        .login-card {
+            max-width: 480px;
+            margin: 4rem auto;
+            background: rgba(26, 26, 29, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(231, 76, 96, 0.3);
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(37, 37, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(231, 76, 96, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(231, 76, 96, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(231, 76, 96, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(37, 37, 42, 0.6);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(37, 37, 42, 0.8);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Video Player */
+        .video-container {
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .video-card {
+            background: rgba(26, 26, 29, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-player {
+            position: relative;
+            aspect-ratio: 9/16;
+            background: #000;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1d, #0a0a0b);
+        }
+
+        .tiktok-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(231, 76, 96, 0.4);
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+        }
+
+        .timer {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .timer-display {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            width: 280px;
+            height: 8px;
+            background: rgba(37, 37, 42, 0.6);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #ff6b7a);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        /* Actions Grid */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: rgba(26, 26, 29, 0.6);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-card:not(.disabled):hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(231, 76, 96, 0.2);
+        }
+
+        .action-card.completed {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .action-card.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .action-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .action-points {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(26, 26, 29, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 2rem;
+            background: rgba(26, 26, 29, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-color: var(--success);
+        }
+
+        .notification.error {
+            border-color: var(--danger);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Onboarding Progress */
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .step {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(37, 37, 42, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+        }
+
+        .step.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px rgba(231, 76, 96, 0.4);
+        }
+
+        .step.completed {
+            background: linear-gradient(135deg, var(--success), #059669);
+            border-color: var(--success);
+        }
+
+        .step-line {
+            width: 60px;
+            height: 2px;
+            background: var(--border-color);
+        }
+
+        .step-line.active {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">⚡ TikRewards</div>
+                <div class="points-display">
+                    <div class="points-badge">
+                        Points: <span class="points-number" id="pointsDisplay">0</span>
+                    </div>
+                    <button class="btn btn-secondary" id="navBtn" style="width: auto; padding: 0.5rem 1.5rem;">
+                        Creator Portal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen active">
+            <div class="login-card">
+                <div class="login-icon">
+                    <svg width="48" height="48" fill="white" viewBox="0 0 24 24">
+                        <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                        <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h1>Welcome!</h1>
+                <p class="subtitle">Watch videos, earn points, submit content</p>
+                
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="emailInput" placeholder="you@example.com">
+                </div>
+                
+                <button class="btn" onclick="login()">Continue with Email</button>
+                
+                <div style="margin-top: 2rem; padding: 1rem; background: rgba(231, 76, 96, 0.05); border: 1px solid rgba(231, 76, 96, 0.2); border-radius: 12px;">
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); text-align: center;">
+                        <strong style="color: var(--text-primary);">Note:</strong> This is a frontend demo. All data is simulated and resets on page refresh.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onboarding Screen -->
+        <div id="onboardingScreen" class="screen">
+            <div class="login-card" style="max-width: 600px;">
+                <div class="progress-steps">
+                    <div class="step active">1</div>
+                    <div class="step-line"></div>
+                    <div class="step">2</div>
+                    <div class="step-line"></div>
+                    <div class="step">3</div>
+                </div>
+                
+                <div id="onboardingStep1">
+                    <div class="login-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                        <svg width="48" height="48" fill="white" viewBox="0 0 24 24">
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h1 style="font-size: 2rem;">Get Started!</h1>
+                    <p class="subtitle">Follow @0xFinanceFirst and watch 2 videos to unlock free submissions</p>
+                    <button class="btn" onclick="startOnboarding()">Let's Go!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Viewer Screen -->
+        <div id="viewerScreen" class="screen">
+            <div class="video-container">
+                <div class="video-card">
+                    <div class="video-player" id="videoPlayer">
+                        <div class="video-placeholder">
+                            <svg class="tiktok-icon" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+                            </svg>
+                            <p style="color: var(--text-secondary);">TikTok Video Player</p>
+                        </div>
+                        <div class="video-overlay" id="videoOverlay">
+                            <div class="play-button" onclick="startWatching()">
+                                <svg width="32" height="32" fill="white" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="actions-grid">
+                    <div class="action-card disabled" id="likeBtn" onclick="clickLike()">
+                        <div class="action-icon">❤️</div>
+                        <div class="action-title">Like</div>
+                        <div class="action-points">+5 pts</div>
+                    </div>
+                    <div class="action-card disabled" id="commentBtn" onclick="clickComment()">
+                        <div class="action-icon">💬</div>
+                        <div class="action-title">Comment</div>
+                        <div class="action-points">+10 pts</div>
+                    </div>
+                    <div class="action-card disabled" id="nextBtn" onclick="completeVideo()">
+                        <div class="action-icon">→</div>
+                        <div class="action-title">Next</div>
+                        <div class="action-points">Submit</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <h3 style="margin-bottom: 1rem;">Potential Earnings</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; text-align: left;">
+                        <div>Watch (90%+):</div>
+                        <div style="text-align: right;" id="watchPoints">+10 pts</div>
+                        <div>Like:</div>
+                        <div style="text-align: right;" id="likePoints">+5 pts</div>
+                        <div>Comment:</div>
+                        <div style="text-align: right;" id="commentPoints">+10 pts</div>
+                        <div style="border-top: 1px solid var(--border-color); padding-top: 0.5rem; font-weight: 700;">Bonus (1.5x):</div>
+                        <div style="border-top: 1px solid var(--border-color); padding-top: 0.5rem; text-align: right; font-weight: 700; color: var(--primary);" id="bonusPoints">+38 pts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Creator Screen -->
+        <div id="creatorScreen" class="screen">
+            <div style="max-width: 800px; margin: 0 auto;">
+                <h1 style="text-align: center; margin-bottom: 1rem;">Submit Your Video</h1>
+                <p class="subtitle" style="text-align: center; margin-bottom: 2rem;">Get your TikTok video shown to engaged viewers</p>
+                
+                <div class="stats-grid" style="margin-bottom: 3rem;">
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: var(--primary);" id="creatorPoints">0</div>
+                        <div class="stat-label">Your Points</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: var(--success);">2</div>
+                        <div class="stat-label">Free Slots Left</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: #3b82f6;">3,800</div>
+                        <div class="stat-label">Points Required</div>
+                    </div>
+                </div>
+
+                <div class="video-card" style="padding: 2rem;">
+                    <div class="input-group">
+                        <label>TikTok Video URL</label>
+                        <input type="url" id="videoUrl" placeholder="https://www.tiktok.com/@username/video/123456789">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <h3 style="margin-bottom: 1rem;">Free Submission</h3>
+                            <div style="background: rgba(37, 37, 42, 0.6); padding: 1rem; border-radius: 12px; margin-bottom: 1rem; font-size: 0.9rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: var(--text-secondary);">Cost:</span>
+                                    <span>3,800 points</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: var(--text-secondary);">Wait:</span>
+                                    <span>~30 minutes</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--text-secondary);">Slots:</span>
+                                    <span style="color: var(--success);">2/2</span>
+                                </div>
+                            </div>
+                            <button class="btn" onclick="submitFree()">Submit Free</button>
+                        </div>
+
+                        <div>
+                            <h3 style="margin-bottom: 1rem;">Paid Submission</h3>
+                            <div style="background: rgba(37, 37, 42, 0.6); padding: 1rem; border-radius: 12px; margin-bottom: 1rem; font-size: 0.9rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: var(--text-secondary);">Cost:</span>
+                                    <span>$1.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: var(--text-secondary);">Wait:</span>
+                                    <span style="color: var(--success);">Instant</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--text-secondary);">Priority:</span>
+                                    <span style="color: var(--primary);">Highest</span>
+                                </div>
+                            </div>
+                            <button class="btn" onclick="submitPaid()">Pay & Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // State
+        let state = {
+            points: 0,
+            watchTime: 0,
+            videoLength: 30,
+            watching: false,
+            watchCompleted: false,
+            likeClicked: false,
+            commentClicked: false,
+            videosWatched: 0
+        };
+
+        // Navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function login() {
+            const email = document.getElementById('emailInput').value;
+            if (!email) {
+                showNotification('Please enter your email', 'error');
+                return;
+            }
+            showNotification('Welcome! Let\'s get you onboarded.', 'success');
+            setTimeout(() => showScreen('onboardingScreen'), 500);
+        }
+
+        function startOnboarding() {
+            showNotification('Onboarding completed! You earned 76 points from watching 2 videos.', 'success');
+            state.points = 76;
+            state.videosWatched = 2;
+            updatePoints();
+            setTimeout(() => showScreen('viewerScreen'), 500);
+        }
+
+        // Video watching
+        function startWatching() {
+            if (state.watching) return;
+            
+            state.watching = true;
+            state.watchTime = 0;
+            state.watchCompleted = false;
+            
+            const overlay = document.getElementById('videoOverlay');
+            overlay.innerHTML = `
+                <div class="timer">
+                    <div class="timer-display" id="timerDisplay">0s / ${state.videoLength}s</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+            `;
+            
+            const interval = setInterval(() => {
+                state.watchTime++;
+                const progress = (state.watchTime / state.videoLength) * 100;
+                
+                document.getElementById('timerDisplay').textContent = `${state.watchTime}s / ${state.videoLength}s`;
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                
+                if (state.watchTime >= state.videoLength) {
+                    clearInterval(interval);
+                    overlay.style.display = 'none';
+                    state.watchCompleted = true;
+                    document.getElementById('likeBtn').classList.remove('disabled');
+                    showNotification('Video watched! Now like and comment for bonus points.', 'success');
+                }
+            }, 1000);
+        }
+
+        function clickLike() {
+            if (!state.watchCompleted || state.likeClicked) return;
+            
+            state.likeClicked = true;
+            document.getElementById('likeBtn').classList.add('completed');
+            document.getElementById('commentBtn').classList.remove('disabled');
+            document.getElementById('likePoints').style.color = 'var(--success)';
+            showNotification('Like tracked! Opening TikTok...', 'success');
+            
+            // Simulate opening TikTok
+            setTimeout(() => {
+                showNotification('Now leave a comment for +10 more points!', 'success');
+            }, 1000);
+        }
+
+        function clickComment() {
+            if (!state.likeClicked || state.commentClicked) return;
+            
+            state.commentClicked = true;
+            document.getElementById('commentBtn').classList.add('completed');
+            document.getElementById('nextBtn').classList.remove('disabled');
+            document.getElementById('commentPoints').style.color = 'var(--success)';
+            document.getElementById('bonusPoints').style.color = 'var(--success)';
+            showNotification('Comment tracked! Click Next to earn your points.', 'success');
+        }
+
+        function completeVideo() {
+            if (!state.watchCompleted) {
+                showNotification('Please watch the full video first!', 'error');
+                return;
+            }
+            
+            let earned = 10; // Base watch points
+            if (state.likeClicked) earned += 5;
+            if (state.commentClicked) earned += 10;
+            
+            // Apply 1.5x multiplier if all three completed
+            if (state.watchCompleted && state.likeClicked && state.commentClicked) {
+                earned = Math.round(earned * 1.5); // = 38
+            }
+            
+            state.points += earned;
+            state.videosWatched++;
+            updatePoints();
+            
+            showNotification(`+${earned} points earned! Total: ${state.points}`, 'success');
+            
+            // Reset for next video
+            resetVideo();
+        }
+
+        function resetVideo() {
+            state.watching = false;
+            state.watchTime = 0;
+            state.watchCompleted = false;
+            state.likeClicked = false;
+            state.commentClicked = false;
+            
+            document.getElementById('videoOverlay').style.display = 'flex';
+            document.getElementById('videoOverlay').innerHTML = `
+                <div class="play-button" onclick="startWatching()">
+                    <svg width="32" height="32" fill="white" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                </div>
+            `;
+            
+            document.getElementById('likeBtn').classList.remove('completed');
+            document.getElementById('likeBtn').classList.add('disabled');
+            document.getElementById('commentBtn').classList.remove('completed');
+            document.getElementById('commentBtn').classList.add('disabled');
+            document.getElementById('nextBtn').classList.add('disabled');
+            
+            document.getElementById('likePoints').style.color = '';
+            document.getElementById('commentPoints').style.color = '';
+            document.getElementById('bonusPoints').style.color = 'var(--primary)';
+        }
+
+        function updatePoints() {
+            document.getElementById('pointsDisplay').textContent = state.points;
+            document.getElementById('creatorPoints').textContent = state.points;
+        }
+
+        // Creator functions
+        function submitFree() {
+            const url = document.getElementById('videoUrl').value;
+            if (!url) {
+                showNotification('Please enter a TikTok URL', 'error');
+                return;
+            }
+            
+            if (state.points < 3800) {
+                showNotification(`Need ${3800 - state.points} more points to submit!`, 'error');
+                return;
+            }
+            
+            showNotification('Video submitted! It will be activated in 30 minutes.', 'success');
+            document.getElementById('videoUrl').value = '';
+        }
+
+        function submitPaid() {
+            const url = document.getElementById('videoUrl').value;
+            if (!url) {
+                showNotification('Please enter a TikTok URL', 'error');
+                return;
+            }
+            
+            showNotification('Payment integration coming in Phase 2!', 'success');
+        }
+
+        // Navigation button
+        document.getElementById('navBtn').addEventListener('click', () => {
+            const current = document.querySelector('.screen.active').id;
+            if (current === 'creatorScreen') {
+                showScreen('viewerScreen');
+                document.getElementById('navBtn').textContent = 'Creator Portal';
+            } else if (current === 'viewerScreen') {
+                showScreen('creatorScreen');
+                document.getElementById('navBtn').textContent = 'Back to Watching';
+            }
+        });
+
+        // Notifications
+        function showNotification(message, type = 'success') {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.className = `notification ${type}`;
+            notif.classList.add('show');
+            
+            setTimeout(() => {
+                notif.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
